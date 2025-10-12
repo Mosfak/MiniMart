@@ -12,9 +12,9 @@ namespace MiniMart.Controllers
         // In-memory product list
         private static List<Models.Product> _products = new List<Models.Product>
         {
-            new Models.Product { Name = "Apple", Price = 0.5M, category = "Fruits" },
-            new Models.Product { Name = "Banana", Price = 0.3M, category = "Fruits" },
-            new Models.Product { Name = "Carrot", Price = 0.2M, category = "Vegetables" }
+            new Models.Product { Name = "Apple", Price = 0.5M, Category = "Fruits" },
+            new Models.Product { Name = "Banana", Price = 0.3M, Category = "Fruits" },
+            new Models.Product { Name = "Carrot", Price = 0.2M, Category = "Vegetables" }
         };
 
         [HttpGet]
