@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using MiniMart.Services;
 
 namespace MiniMart.Controllers
 {
@@ -9,19 +11,20 @@ namespace MiniMart.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        // In-memory product list
-        private static List<Models.Product> _products = new List<Models.Product>
+        private readonly Data.MiniMartDbContext _context;
+
+        public ProductsController(Data.MiniMartDbContext context)
         {
-            new Models.Product { Name = "Apple", Price = 0.5M, Category = "Fruits" },
-            new Models.Product { Name = "Banana", Price = 0.3M, Category = "Fruits" },
-            new Models.Product { Name = "Carrot", Price = 0.2M, Category = "Vegetables" }
-        };
+            _context = context;
+        }
 
         [HttpGet]
         public IActionResult GetProducts()
         {
-            return Ok(_products);
+            var products = _context.Products.ToList();
+            return Ok(products);
         }
+
         [HttpPost]
         public IActionResult AddProduct([FromBody] Models.Product product)
         {
@@ -29,7 +32,8 @@ namespace MiniMart.Controllers
             {
                 return BadRequest("Invalid product data.");
             }
-            _products.Add(product);
+            _context.Products.Add(product);
+            _context.SaveChanges();
             return CreatedAtAction(nameof(GetProducts), new { name = product.Name }, product);
         }
     }
