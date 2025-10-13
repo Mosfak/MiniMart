@@ -7,7 +7,6 @@ using MiniMart.Services;
 
 namespace MiniMart.Controllers
 {
-    [Authorize(Roles = "Admin,Customer")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
@@ -20,6 +19,7 @@ namespace MiniMart.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Customer")]
         public IActionResult GetProducts()
         {
             var products = _context.Products.ToList();
@@ -27,9 +27,10 @@ namespace MiniMart.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult AddProduct([FromBody] Models.Product product)
         {
-            if (product == null || string.IsNullOrEmpty(product.Name) || product.Price <= 0)
+            if (product == null || string.IsNullOrEmpty(product.Name) || product.Price < 0)
             {
                 return BadRequest("Invalid product data.");
             }
@@ -46,13 +47,14 @@ namespace MiniMart.Controllers
 
             if (product == null)
             {
-                return NotFound($"Product with ID {productId} not found.");
+                return NotFound(new { message = $"Product with ID {productId} not found." });
             }
 
             _context.Set<Product>().Remove(product);
             _context.SaveChanges();
 
-            return Ok($"Product {product.Name} has been deleted successfully with ID {productId}");
+            return Ok(new { message = $"Product '{product.Name}' has been deleted successfully.", productId });
         }
+
     }
 }
