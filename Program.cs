@@ -1,5 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using MiniMart.Data;
 using MiniMart.Services;
 
 namespace MiniMart
@@ -17,8 +19,10 @@ namespace MiniMart
                           .AllowAnyHeader()
                           .AllowAnyMethod());
             });
-
+            builder.Services.AddDbContext<MiniMartDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Add services to the container.
+            builder.Services.AddScoped<UserService>();
 
             builder.Services.AddControllers();
 

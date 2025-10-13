@@ -10,43 +10,40 @@ namespace MiniMart.Controllers
     public class AuthController : ControllerBase
     {
         private readonly JWTService _jwtService;
+        private readonly UserService _userService;
 
-        //In memory Database
-        private static List<User> _users = new List<User>
-        {
-            new User { Id = 1, Username = "admin", Role = "Admin" },
-            //new User { Id = 2, Username = "customer", Role = "Customer" }
-        };
+        
 
-        public AuthController(JWTService jwtService)
+        public AuthController(JWTService jwtService, UserService userService)
         {
-            _jwtService = jwtService; 
+            _jwtService = jwtService;
+            _userService=userService;
         }
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            var user = _users.SingleOrDefault(u => u.Username == request.Username);
-            if (user == null)
+            if(request.Password != null)
             {
-                var newCustomer = new User
+                var admin = _userService.GetAdmin(request.Username, request.Password);
+                if (request.Username == "superuser" && request.Password == "Admin123" && admin == null)
                 {
-                    Id = _users.Max(u => u.Id) + 1,
-                    Username = request.Username,
-                    Role = "Customer"
-                };
-                _users.Add(newCustomer);
-                user = newCustomer;
+                    admin = _userService.CreateAdmin(request.Username, request.Password);
+                    var token = _jwtService.GenerateToken(admin); 
+                    return Ok(new { token });
+                }
+                if(admin == null)
+                {
+                    return NotFound("Wrong credentials");
+                }
+                var adminToken = _jwtService.GenerateToken(admin);
+                return Ok(new { token = adminToken });
             }
 
-            if (request.Username == "admin" && request.Password == "Admin123")
-            {
-                var token = _jwtService.GenerateToken(user);
-                return Ok(new { token });
-            }
-
+            var user = _userService.GetUserByUsername(request.Username);
+            if (user == null)
+                 user = _userService.CreateCustomer(request.Username);
             
-
             var customerToken = _jwtService.GenerateToken(user);
             return Ok(new { token = customerToken });
         }
