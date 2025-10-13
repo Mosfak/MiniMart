@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MiniMart.Models;
 using MiniMart.Services;
 
 namespace MiniMart.Controllers
@@ -35,6 +36,23 @@ namespace MiniMart.Controllers
             _context.Products.Add(product);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetProducts), new { name = product.Name }, product);
+        }
+
+        [HttpDelete("{productId}")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult DeleteProduct(int productId)
+        {
+            var product = _context.Set<Product>().Find(productId);
+
+            if (product == null)
+            {
+                return NotFound($"Product with ID {productId} not found.");
+            }
+
+            _context.Set<Product>().Remove(product);
+            _context.SaveChanges();
+
+            return Ok($"Product {product.Name} has been deleted successfully with ID {productId}");
         }
     }
 }
