@@ -87,6 +87,22 @@ namespace MiniMart.Controllers
 
         }
 
+        [HttpGet("Admin")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GetAdmins()
+        {
+            var admins = _context.Set<User>()
+                                 .Where(u => u.Role == "Admin")
+                                 .ToList();
+
+            if (admins == null || !admins.Any())
+            {
+                return NotFound("No admins found.");
+            }
+
+            return Ok(admins);
+        }
+
 
 
     }
