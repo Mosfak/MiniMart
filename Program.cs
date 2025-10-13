@@ -22,6 +22,7 @@ namespace MiniMart
             builder.Services.AddDbContext<MiniMartDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Add services to the container.
+            builder.Services.AddScoped<UserService>();
 
             builder.Services.AddControllers();
 

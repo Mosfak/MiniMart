@@ -52,6 +52,18 @@ namespace MiniMart.Services
             return user;
         }
 
+        public User GetAdmin(string username, string password)
+        {
+            
+                var admin = _context.Users
+                    .FirstOrDefault(u => u.Username == username
+                                      && u.Password == password
+                                      && u.Role == Role.Admin.ToString());
+
+                return admin;
+        }
+        
+
         public User DeleteUser(string username)
         {
             var user = GetUserByUsername(username);

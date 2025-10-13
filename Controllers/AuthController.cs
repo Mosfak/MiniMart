@@ -23,17 +23,27 @@ namespace MiniMart.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            var user = _userService.GetUserByUsername(request.Username);
-            if (user == null)
-                 _userService.CreateCustomer(request.Username);
-
-            user = _userService.GetUserByUsername(request.Username);
-            if (request.Username == "admin" && request.Password == "Admin123" || user.Role == UserService.Role.Admin.ToString())
+            if(request.Password != null)
             {
-                var token = _jwtService.GenerateToken(user);
-                return Ok(new { token });
+                var admin = _userService.GetAdmin(request.Username, request.Password);
+                if (request.Username == "superuser" && request.Password == "Admin123" && admin == null)
+                {
+                    admin = _userService.CreateAdmin(request.Username, request.Password);
+                    var token = _jwtService.GenerateToken(admin); 
+                    return Ok(new { token });
+                }
+                if(admin == null)
+                {
+                    return NotFound("Wrong credentials");
+                }
+                var adminToken = _jwtService.GenerateToken(admin);
+                return Ok(new { token = adminToken });
             }
 
+            var user = _userService.GetUserByUsername(request.Username);
+            if (user == null)
+                 user = _userService.CreateCustomer(request.Username);
+            
             var customerToken = _jwtService.GenerateToken(user);
             return Ok(new { token = customerToken });
         }
