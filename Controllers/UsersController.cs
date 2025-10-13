@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniMart.Models;
 using MiniMart.Services;
@@ -37,7 +39,7 @@ namespace MiniMart.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
+        [HttpPost("customer")]
         public IActionResult CreateCustomer([FromBody] User newUser)
         {
             User user; 
@@ -60,6 +62,30 @@ namespace MiniMart.Controllers
             return Ok(user);
         }
 
+        [HttpPost("admin")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult CreateAdmin([FromBody] User newAdmin)
+        {
+            User user;
+            if (newAdmin == null || newAdmin.Username == null || newAdmin.Password == null)
+            {
+                return BadRequest("User data is required.");
+            }
+            try
+            {
+                user = _userService.CreateAdmin(newAdmin.Username, newAdmin.Password);
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException?.Message.Contains("IX_Users_Username") == true)
+                {
+                    return BadRequest("this username already exists.");
+                }
+                throw;
+            }
+            return Ok(user);
+
+        }
 
 
 
