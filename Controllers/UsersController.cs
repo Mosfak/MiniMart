@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniMart.Models;
+using MiniMart.Services;
+
 
 namespace MiniMart.Controllers
 {
@@ -9,10 +11,12 @@ namespace MiniMart.Controllers
     public class UsersController : ControllerBase
     {
         private readonly Data.MiniMartDbContext _context;
+        private readonly UserService _userService;
 
-        public UsersController(Data.MiniMartDbContext context)
+        public UsersController(Data.MiniMartDbContext context, UserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -34,17 +38,16 @@ namespace MiniMart.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateUser([FromBody] User newUser)
+        public IActionResult CreateCustomer([FromBody] User newUser)
         {
+            User user; 
             if (newUser == null)
             {
                 return BadRequest("User data is required.");
             }
-
             try
             {
-                _context.Users.Add(newUser);
-                _context.SaveChanges();
+                user = _userService.CreateCustomer(newUser.Username);
             }
             catch (DbUpdateException ex)
             {
@@ -54,7 +57,11 @@ namespace MiniMart.Controllers
                 }
                 throw;
             }
-            return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, newUser);
+            return Ok(user);
         }
+
+
+
+
     }
 }
