@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using MiniMart.Models;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace MiniMart.Services
 {
@@ -19,8 +20,8 @@ namespace MiniMart.Services
 
             var claims = new[]
             {
-                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.Username),
-                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role)
+                new System.Security.Claims.Claim(ClaimTypes.Name, user.Username),
+                new System.Security.Claims.Claim(ClaimTypes.Role, user.Role)
             };
 
             var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(

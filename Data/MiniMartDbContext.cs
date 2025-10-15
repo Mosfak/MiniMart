@@ -7,6 +7,9 @@ namespace MiniMart.Data
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<OrderSummary> OrderSummary { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+
         public MiniMartDbContext(DbContextOptions<MiniMartDbContext> options) : base(options){}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

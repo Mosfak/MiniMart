@@ -39,6 +39,23 @@ namespace MiniMart.Controllers
             return Ok(user);
         }
 
+        [HttpGet("GetUserByUsername")]
+        public IActionResult GetUserByUsername([FromQuery] string userName)
+        {
+           if (string.IsNullOrEmpty(userName))
+                return BadRequest("Username is required.");
+
+            var user = _context.Users
+                .SingleOrDefault(u => u.Username == userName);
+
+            if (user == null)
+                return NotFound($"User with username '{userName}' not found.");
+
+            return Ok(user);
+        }
+
+
+
         [HttpPost("customer")]
         public IActionResult CreateCustomer([FromBody] User newUser)
         {
